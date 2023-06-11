@@ -9,7 +9,11 @@ import java.nio.ByteBuffer;
  *
  */
 public interface Response {
-    ResponseType type = null;
+    ResponseType type();
+
+    String toString();
+
+
 
 
 }
