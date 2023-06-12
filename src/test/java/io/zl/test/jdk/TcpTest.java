@@ -1,8 +1,12 @@
 package io.zl.test.jdk;
 
 import io.vertx.redis.client.Command;
+import io.vertx.redis.client.impl.RESPParser;
 import io.zl.Request;
-import io.zl.util.CharBuffers;
+import io.zl.Response;
+import io.zl.handler.RESPHandler;
+import io.zl.handler.ResponseHandler;
+import io.zl.util.ByteBuffers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -25,8 +29,12 @@ public class TcpTest {
 
     static SocketChannel socketChannel;
 
+    static RESPHandler parser;
+
     @BeforeAll
     public static void init() throws IOException, InterruptedException {
+
+        parser=new RESPHandler(new ResponseHandler());
 
         // 创建 SocketChannel 对象
         socketChannel = SocketChannel.open();
@@ -52,7 +60,7 @@ public class TcpTest {
     public void write() throws IOException {
         // 连接完成后发送数据
         ByteBuffer buffer = setRequestBuffer();
-        logger.info("charBuffer:{}", CharBuffers.toStr(buffer));
+        logger.info("charBuffer:{}", ByteBuffers.toStr(buffer));
 
         Integer write = socketChannel.write(setRequestBuffer().flip());
         logger.info("write:{} ", write);
@@ -72,7 +80,9 @@ public class TcpTest {
                 continue;
             }
 
-            logger.info("response:{}", CharBuffers.toStr(buffer));
+            buffer.flip();
+            Response response = parser.paresToResponse(buffer);
+            logger.info("response:{}", response);
 
             buffer.clear();
             break;

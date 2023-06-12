@@ -11,7 +11,7 @@ public class SimpleStringResponse implements Response {
     }
     @Override
     public String toString() {
-        return super.toString();
+        return message;
     }
 
     @Override
